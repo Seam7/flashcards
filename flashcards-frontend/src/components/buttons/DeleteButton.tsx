@@ -1,4 +1,4 @@
-import TrashIcon from "/public/icons/delete.svg?react";
+import TrashIcon from "/src/icons/delete.svg?react";
 
 export const DeleteButton = ({ onClick }: { onClick: () => void }) => {
   return (
