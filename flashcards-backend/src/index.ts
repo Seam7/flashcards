@@ -1,0 +1,63 @@
+const express = require('express');
+const cors = require('cors');
+const { PrismaClient } = require('../src/generated/prisma');
+
+const app = express();
+const prisma = new PrismaClient();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Root route - Get all users
+app.get('/', async (req: any, res: any) => {
+  try {
+    const users = await prisma.user.findMany();
+    res.json({
+      success: true,
+      data: users,
+      count: users.length
+    });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch users'
+    });
+  }
+});
+
+app.post('/deck', async (req: any, res: any) => {
+  console.log(req.body);
+  console.log("-----------------------------------")
+  const { name, userId } = req.body;
+  const deck = await prisma.deck.create({ data: { name, userId } });
+  res.json({ success: true, data: deck });
+});
+
+app.get('/decks', async (req: any, res: any) => {
+  const decks = await prisma.deck.findMany();
+  res.json({ success: true, data: decks });
+});
+
+// Health check route
+app.get('/health', (req: any, res: any) => {
+  res.json({ status: 'OK', message: 'Server is running' });
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📊 Users endpoint: http://localhost:${PORT}/`);
+  console.log(`❤️  Health check: http://localhost:${PORT}/health`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('\n🛑 Shutting down server...');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+// Fracchiolla

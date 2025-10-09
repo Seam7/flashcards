@@ -1,0 +1,1 @@
+export type { User, Deck, Flashcard } from "../flashcards-backend/src/generated/prisma";

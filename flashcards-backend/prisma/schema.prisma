@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  name  String
+  email    String  @unique
+  age      Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  decks    Deck[]
+}
+
+model Deck {
+  id   Int @id @default(autoincrement())
+  userId Int
+  user User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cards Flashcard[]
+}
+
+model Flashcard {
+  id   Int @id @default(autoincrement())
+  deckId Int
+  deck Deck    @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  question String
+  answer String
+  status Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+// Direct Prisma operations
+// prisma.user.create({ data: { name: "Charlie", email: "charlie@example.com", age: 28 } })
+// prisma.user.findMany()
+// prisma.user.findUnique({ where: { email: "charlie@example.com" } })
