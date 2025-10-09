@@ -25,8 +25,6 @@ app.get('/', async (req: any, res: any) => {
 });
 
 app.post('/deck', async (req: any, res: any) => {
-  console.log(req.body);
-  console.log("-----------------------------------")
   const { name, userId } = req.body;
   const deck = await prisma.deck.create({ data: { name, userId } });
   res.json(deck);
@@ -43,10 +41,22 @@ app.get('/deck/:id', async (req: any, res: any) => {
   res.json(deck);
 });
 
+app.delete('/deck/:id', async (req: any, res: any) => {
+  const { id } = req.params;
+  await prisma.deck.delete({ where: { id: Number(id) } });
+  res.json({ message: 'Deck deleted' });
+});
+
 app.post('/card', async (req: any, res: any) => {
   const { question, answer, deckId } = req.body;
   const card = await prisma.flashcard.create({ data: { question, answer, deckId } });
   res.json(card);
+});
+
+app.delete('/card/:id', async (req: any, res: any) => {
+  const { id } = req.params;
+  await prisma.flashcard.delete({ where: { id: Number(id) } });
+  res.json({ message: 'Card deleted' });
 });
 
 // Health check route
