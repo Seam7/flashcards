@@ -4,6 +4,7 @@ import { Hello } from "../src/components/Hello";
 import { Entry } from "../src/Entry";
 import { CreateDeck } from "../src/components/CreateDeck";
 import { SingleDeck } from "../src/components/SingleDeck";
+import { CreateCard } from "../src/components/CreateCard";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         path: "deck/:id",
         Component: SingleDeck,
+      },
+      {
+        path: "deck/:id/new",
+        Component: CreateCard,
       }
     ],
   },

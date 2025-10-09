@@ -43,6 +43,12 @@ app.get('/deck/:id', async (req: any, res: any) => {
   res.json(deck);
 });
 
+app.post('/card', async (req: any, res: any) => {
+  const { question, answer, deckId } = req.body;
+  const card = await prisma.flashcard.create({ data: { question, answer, deckId } });
+  res.json(card);
+});
+
 // Health check route
 app.get('/health', (req: any, res: any) => {
   res.json({ status: 'OK', message: 'Server is running' });
