@@ -14,11 +14,7 @@ app.use(express.json());
 app.get('/', async (req: any, res: any) => {
   try {
     const users = await prisma.user.findMany();
-    res.json({
-      success: true,
-      data: users,
-      count: users.length
-    });
+    res.json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({
@@ -33,12 +29,18 @@ app.post('/deck', async (req: any, res: any) => {
   console.log("-----------------------------------")
   const { name, userId } = req.body;
   const deck = await prisma.deck.create({ data: { name, userId } });
-  res.json({ success: true, data: deck });
+  res.json(deck);
 });
 
 app.get('/decks', async (req: any, res: any) => {
   const decks = await prisma.deck.findMany();
-  res.json({ success: true, data: decks });
+  res.json(decks);
+});
+
+app.get('/deck/:id', async (req: any, res: any) => {
+  const { id } = req.params;
+  const deck = await prisma.deck.findUnique({ where: { id: Number(id) }, include: { cards: true } });
+  res.json(deck);
 });
 
 // Health check route

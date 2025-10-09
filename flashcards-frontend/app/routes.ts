@@ -3,6 +3,7 @@ import App from "../src/App";
 import { Hello } from "../src/components/Hello";
 import { Entry } from "../src/Entry";
 import { CreateDeck } from "../src/components/CreateDeck";
+import { SingleDeck } from "../src/components/SingleDeck";
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ export const router = createBrowserRouter([
       {
         path: "create-deck",
         Component: CreateDeck,
+      },
+      {
+        path: "deck/:id",
+        Component: SingleDeck,
       }
     ],
   },
