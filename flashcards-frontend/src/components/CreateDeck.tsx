@@ -2,9 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { postCreateDeck } from "../queries/postCreateDeck";
 import { useUser } from "../hooks/useUser";
-import { Link, useNavigate } from "react-router";
-import { Button } from "@mui/material";
-import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
+import { useNavigate } from "react-router";
+import { Button, TextField } from "@mui/material";
 import { Title } from "./layout/Title";
 
 export const CreateDeck = () => {
@@ -29,19 +28,22 @@ export const CreateDeck = () => {
     return <div>No user found</div>;
   }
 
+  const isInvalid = !deckName;
+
   return (
     <div>
       <Title link="/" title="Create Deck" />
       <p>Creating deck for: {user.name}</p>
-      <input
+      <TextField
+        label="Deck Name"
         type="text"
-        placeholder="Deck Name"
         value={deckName}
         onChange={(e) => setDeckName(e.target.value)}
       />
       <Button
         variant="contained"
         color="primary"
+        disabled={isInvalid}
         onClick={() => {
           createDeck({ deckName, userId: user.id });
         }}

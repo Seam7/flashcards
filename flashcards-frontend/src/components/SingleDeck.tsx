@@ -6,6 +6,7 @@ import { deleteCard } from "../queries/deleteCard";
 import { DeleteButton } from "./buttons/DeleteButton";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import { Title } from "./layout/Title";
+import { Button } from "@mui/material";
 
 export const SingleDeck = () => {
   const { id } = useParams();
@@ -27,13 +28,15 @@ export const SingleDeck = () => {
       <Title link="/" title={data?.name ?? ""} />
       <p>Cards: {data?.cards?.length}</p>
       <p>User: {user?.name}</p>
-      <button
+      <Button
+        variant="contained"
+        color="primary"
         onClick={() => {
           navigate(`/deck/${id}/new`);
         }}
       >
         Add New Card
-      </button>
+      </Button>
       {data?.cards?.map((card) => (
         <div key={card.id}>
           {/* !TODO: Blur answer and add button to show it */}
