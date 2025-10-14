@@ -3,6 +3,9 @@ import { useState } from "react";
 import { postCreateDeck } from "../queries/postCreateDeck";
 import { useUser } from "../hooks/useUser";
 import { Link, useNavigate } from "react-router";
+import { Button } from "@mui/material";
+import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
+import { Title } from "./layout/Title";
 
 export const CreateDeck = () => {
   const [deckName, setDeckName] = useState("");
@@ -28,8 +31,7 @@ export const CreateDeck = () => {
 
   return (
     <div>
-      <Link to="/">Back</Link>
-      <h1>Create Deck</h1>
+      <Title link="/" title="Create Deck" />
       <p>Creating deck for: {user.name}</p>
       <input
         type="text"
@@ -37,13 +39,15 @@ export const CreateDeck = () => {
         value={deckName}
         onChange={(e) => setDeckName(e.target.value)}
       />
-      <button
+      <Button
+        variant="contained"
+        color="primary"
         onClick={() => {
           createDeck({ deckName, userId: user.id });
         }}
       >
         Create Deck
-      </button>
+      </Button>
     </div>
   );
 };

@@ -4,6 +4,8 @@ import { getSingleDeck } from "../queries/getDecks";
 import { useUser } from "../hooks/useUser";
 import { deleteCard } from "../queries/deleteCard";
 import { DeleteButton } from "./buttons/DeleteButton";
+import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
+import { Title } from "./layout/Title";
 
 export const SingleDeck = () => {
   const { id } = useParams();
@@ -22,8 +24,7 @@ export const SingleDeck = () => {
   });
   return (
     <>
-      <Link to="/">Back</Link>
-      <h1>{data?.name}</h1>
+      <Title link="/" title={data?.name ?? ""} />
       <p>Cards: {data?.cards?.length}</p>
       <p>User: {user?.name}</p>
       <button

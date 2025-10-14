@@ -8,7 +8,16 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <UserProvider>
-        <Outlet />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            padding: "30px",
+          }}
+        >
+          <Outlet />
+        </div>
       </UserProvider>
     </QueryClientProvider>
   );

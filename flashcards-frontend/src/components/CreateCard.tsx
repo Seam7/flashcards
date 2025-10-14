@@ -2,6 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { postCreateCard } from "../queries/postCreateCard";
+import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
+import { Title } from "./layout/Title";
 
 export const CreateCard = () => {
   const { id } = useParams();
@@ -29,11 +31,9 @@ export const CreateCard = () => {
   });
   return (
     <>
-      <Link to={`/deck/${id}`}>Back</Link>
-      <div>
-        <h1>Create Card</h1>
-        <p>Creating card for deck: {id}</p>
-      </div>
+      <Title link={`/deck/${id}`} title="Create Card" />
+      <p>Creating card for deck: {id}</p>
+
       <div>
         <input
           type="text"
