@@ -25,6 +25,15 @@ export const SingleDeck = () => {
   return (
     <>
       <Title link="/" title={data?.name ?? ""} />
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => {
+          navigate(`/deck/${id}/quiz`);
+        }}
+      >
+        Start Quiz
+      </Button>
       <p>Cards: {data?.cards?.length}</p>
       <p>User: {user?.name}</p>
       <Button

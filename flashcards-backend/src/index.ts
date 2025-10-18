@@ -41,6 +41,13 @@ app.get('/deck/:id', async (req: any, res: any) => {
   res.json(deck);
 });
 
+app.put('/deck/:id', async (req: any, res: any) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  await prisma.deck.update({ where: { id: Number(id) }, data: { name } });
+  res.json({ message: 'Deck updated' });
+});
+
 app.delete('/deck/:id', async (req: any, res: any) => {
   const { id } = req.params;
   await prisma.deck.delete({ where: { id: Number(id) } });
