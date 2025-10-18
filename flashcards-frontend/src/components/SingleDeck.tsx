@@ -1,12 +1,11 @@
-import { Link, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getSingleDeck } from "../queries/getDecks";
 import { useUser } from "../hooks/useUser";
 import { deleteCard } from "../queries/deleteCard";
-import { DeleteButton } from "./buttons/DeleteButton";
-import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import { Title } from "./layout/Title";
 import { Button } from "@mui/material";
+import { DeckCard } from "./DeckCard";
 
 export const SingleDeck = () => {
   const { id } = useParams();
@@ -39,13 +38,7 @@ export const SingleDeck = () => {
       </Button>
       {data?.cards?.map((card) => (
         <div key={card.id}>
-          {/* !TODO: Blur answer and add button to show it */}
-          <span>{card.question}</span>-<span>{card.answer}</span>
-          <DeleteButton
-            onClick={() => {
-              deleteCardMutation(card.id);
-            }}
-          />
+          <DeckCard card={card} onDelete={deleteCardMutation} />
         </div>
       ))}
     </>
