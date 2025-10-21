@@ -55,7 +55,7 @@ const DeckItem = ({
   const [isEditing, setIsEditing] = useState(false);
   const [deckName, setDeckName] = useState(deck.name);
   return (
-    <div style={{ display: "flex", alignItems: "center" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
       <div style={{ display: "flex", margin: "10px 0" }}>
         {isEditing ? (
           <TextField

@@ -28,6 +28,7 @@ export const SingleDeck = () => {
       <Button
         variant="contained"
         color="primary"
+        disabled={data?.cards?.length === 0}
         onClick={() => {
           navigate(`/deck/${id}/quiz`);
         }}

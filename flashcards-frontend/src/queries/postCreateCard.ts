@@ -5,6 +5,7 @@ export const postCreateCard = async (question: string, answer: string, deckId: n
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ question, answer, deckId }),
+    credentials: "include",
   });
   if (!response.ok) {
     throw new Error("Failed to create card");

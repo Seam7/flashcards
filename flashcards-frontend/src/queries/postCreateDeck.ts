@@ -5,6 +5,7 @@ export const postCreateDeck = async (deckName: string, userId: number) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ name: deckName, userId }),
+    credentials: "include",
   });
   if (!response.ok) {
     throw new Error("Failed to create deck");

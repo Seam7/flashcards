@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@mui/material";
-import type { Flashcard } from "../../types";
+import type { Flashcard } from "../../../types";
 import type { QuizAction } from "./types";
 
 interface QuizCardProps {

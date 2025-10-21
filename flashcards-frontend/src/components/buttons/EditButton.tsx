@@ -4,7 +4,7 @@ import { Button, Tooltip } from "@mui/material";
 export const EditButton = ({ onClick }: { onClick: () => void }) => {
   return (
     <Tooltip title="Edit">
-      <Button onClick={onClick} style={{ padding: "0px" }}>
+      <Button onClick={onClick} style={{ padding: "0px", minWidth: "0px" }}>
         <EditIcon style={{ width: "25px", height: "30px" }} />
       </Button>
     </Tooltip>

@@ -5,6 +5,7 @@ export const updateDeck = async (id: number, name: string) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ name }),
+    credentials: "include",
   });
   return response.json() as Promise<{ message: string }>;
 };
