@@ -48,7 +48,7 @@ app.post('/deck', authenticateToken, async (req: any, res: any) => {
 });
 
 app.get('/decks', authenticateToken, async (req: any, res: any) => {
-  const decks = await prisma.deck.findMany();
+  const decks = await prisma.deck.findMany({ where: { userId: req.user.userId }});
   res.json(decks);
 });
 
