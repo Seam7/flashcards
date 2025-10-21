@@ -9,7 +9,6 @@ export const CreateAccountForm = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [accStatus, setAccStatus] = useState(false);
 
   const { mutate: createAccount } = useMutation({
     mutationFn: ({
@@ -23,14 +22,18 @@ export const CreateAccountForm = () => {
     }) => createAccountQuery(name, email, password),
     onSuccess: () => {
       console.log("Account created");
-      setAccStatus(true);
+      window.location.reload();
     },
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(name, email, password);
-    createAccount({ name, email, password });
+    try {
+      createAccount({ name, email, password });
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <div>
@@ -59,7 +62,6 @@ export const CreateAccountForm = () => {
         />
         <Button type="submit">Create Account</Button>
       </form>
-      {accStatus && <p>Account created successfully! Please login.</p>}
     </div>
   );
 };
