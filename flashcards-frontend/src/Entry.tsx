@@ -4,6 +4,7 @@ import { Button } from "@mui/material";
 import { useUser } from "./hooks/useUser";
 import { LoginForm } from "./components/LoginForm";
 import { LogoutButton } from "./components/buttons/LogoutButton";
+import { CreateAccountForm } from "./components/CreateAccountForm";
 
 export const Entry = () => {
   const context = useUser();
@@ -33,7 +34,11 @@ export const Entry = () => {
           <DeckList />
         </>
       ) : (
-        <LoginForm />
+        <>
+          <LoginForm />
+          <p>Or</p>
+          <CreateAccountForm />
+        </>
       )}
     </div>
   );

@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 const { PrismaClient } = require('../src/generated/prisma');
 const authenticateToken = require('./authenticateToken');
 
@@ -17,9 +18,19 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 // Root route - Get all users
-app.get('/', authenticateToken, async (req: any, res: any) => {
+app.get('/', async (req: any, res: any) => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        age: true,
+        createdAt: true,
+        updatedAt: true,
+        // Don't include password
+      }
+    });
     res.json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -73,22 +84,35 @@ app.delete('/card/:id', authenticateToken, async (req: any, res: any) => {
 });
 
 app.post('/login', async (req: any, res: any) => {
-  const {email, password} = req.body;
-  const user = await prisma.user.findUnique({ where: { email } });
+  try {
+    const { email, password } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '4h' });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 4 * 60 * 60 * 1000, // 4 hours
+      sameSite: 'strict',
+    });
+    
+    // Don't send password back to client
+    const { password: _, ...userWithoutPassword } = user;
+    res.json({ success: true, message: 'Login successful', user: userWithoutPassword });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ error: 'Login failed' });
   }
-
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '4h' });
-  // res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 4 * 60 * 60 * 1000, // 4 hours
-    sameSite: 'strict',
-  });
-  res.json({ success: true, message: 'Login successful', user });
 })
 
 // Get current authenticated user
@@ -102,7 +126,9 @@ app.get('/me', authenticateToken, async (req: any, res: any) => {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    res.json(user);
+    // Don't send password back to client
+    const { password: _, ...userWithoutPassword } = user;
+    res.json(userWithoutPassword);
   } catch (error) {
     console.error('Error fetching current user:', error);
     res.status(500).json({ error: 'Failed to fetch user' });
@@ -118,6 +144,41 @@ app.post('/logout', (req: any, res: any) => {
   });
   res.json({ success: true, message: 'Logged out successfully' });
 })
+
+app.post('/create-account', async (req: any, res: any) => {
+  try {
+    const { name, email, password } = req.body;
+    
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'User with this email already exists' });
+    }
+    
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // Create user with hashed password
+    const user = await prisma.user.create({ 
+      data: { name, email, password: hashedPassword } 
+    });
+
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '4h' });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 4 * 60 * 60 * 1000, // 4 hours
+      sameSite: 'strict',
+    });
+    
+    // Don't send password back to client
+    const { password: _, ...userWithoutPassword } = user;
+    res.json(userWithoutPassword);
+  } catch (error) {
+    console.error('Error creating account:', error);
+    res.status(500).json({ error: 'Failed to create account' });
+  }
+});
 
 // Health check route
 app.get('/health', (req: any, res: any) => {
