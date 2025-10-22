@@ -19,7 +19,7 @@ export const Entry = () => {
         }}
       >
         <h1>Flash Cards App</h1>
-        <LogoutButton />
+        {context?.user && <LogoutButton />}
       </div>
       <p>Welcome to your flash cards application!</p>
 
