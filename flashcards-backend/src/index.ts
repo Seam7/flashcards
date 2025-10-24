@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const { stringify } = require('csv-stringify/sync');
+const multer = require('multer');
+const { parse: parseCsv } = require('csv-parse/sync');
 // Use a typed require so PrismaClient and prisma are fully typed in CommonJS
 const prismaModule = require('./generated/prisma') as typeof import('./generated/prisma')
 const { PrismaClient } = prismaModule
@@ -11,6 +13,7 @@ const authenticateToken = require('./authenticateToken');
 
 const app = express();
 const prisma = new PrismaClient();
+const upload = multer({storage: multer.memoryStorage()});
 const PORT = process.env.PORT || 3000;
 
 // Middleware
@@ -121,7 +124,62 @@ app.get("/deck/:id/export", authenticateToken, async (req: any, res: any) => {
     console.error('Error exporting deck:', error);
     res.status(500).json({ error: 'Failed to export deck' });
   }
-}); 
+});
+
+
+app.post("/deck/import", authenticateToken, upload.single('file'), async (req: any, res: any) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    if(!req.file.mimetype.includes('csv')) {
+      return res.status(400).json({ error: 'Uploaded file is not a CSV' });
+    }
+
+    const providedName = req.body?.name && String(req.body.name).trim();
+    const derivedNameFromFile = req.file.originalname.replace(/\.[^/.]+$/, '');
+    const name = providedName || derivedNameFromFile || `Imported_${new Date().toISOString().slice(0,10)}`;
+
+  const csvData = req.file.buffer.toString('utf-8');
+  const records = parseCsv(csvData, { columns: true, trim: true, skip_empty_lines: true });
+
+    if (records.length === 0) {
+      return res.status(400).json({ error: 'CSV file is empty or invalid' });
+    }
+
+    const firstRecord = records[0];
+    if (!firstRecord.question || !firstRecord.answer) {
+      return res.status(400).json({ 
+        error: 'CSV must have "question" and "answer" columns' 
+      });
+    }
+
+    const deck = await prisma.deck.create({
+      data: {
+        name,
+        userId: req.user.userId,
+        cards: {
+          create: records.map((record: any) => ({
+            question: record.question,
+            answer: record.answer,
+          })),
+        },
+      },
+      include: { cards: true },
+    });
+
+    res.json({ 
+      success: true, 
+      deck,
+      cardsImported: records.length 
+    });
+    
+  } catch (error) {
+    console.error('Error importing deck:', error);
+    res.status(500).json({ error: 'Failed to import deck' });
+  }
+});
 
 app.post('/login', async (req: any, res: any) => {
   try {

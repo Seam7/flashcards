@@ -5,6 +5,7 @@ import { useUser } from "./hooks/useUser";
 import { LoginForm } from "./components/LoginForm";
 import { LogoutButton } from "./components/buttons/LogoutButton";
 import { CreateAccountForm } from "./components/CreateAccountForm";
+import { ImportButton } from "./components/buttons/ImportButton";
 
 export const Entry = () => {
   const context = useUser();
@@ -30,6 +31,7 @@ export const Entry = () => {
               Create Deck
             </Button>
           </Link>
+          <ImportButton />
 
           <DeckList />
         </>
