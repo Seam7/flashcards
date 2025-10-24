@@ -8,6 +8,7 @@ import { EditButton } from "./buttons/EditButton";
 import type { Deck } from "../../types";
 import { Button, TextField } from "@mui/material";
 import { updateDeck } from "../queries/updateDeck";
+import { ExportButton } from "./buttons/ExportButton";
 
 export const DeckList = () => {
   const queryClient = useQueryClient();
@@ -92,6 +93,7 @@ const DeckItem = ({
               deleteDeckMutation(deck.id);
             }}
           />
+          <ExportButton deckId={deck.id} deckName={deckName} />
         </div>
       )}
     </div>

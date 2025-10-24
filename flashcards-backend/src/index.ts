@@ -3,7 +3,10 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
-const { PrismaClient } = require('../src/generated/prisma');
+const { stringify } = require('csv-stringify/sync');
+// Use a typed require so PrismaClient and prisma are fully typed in CommonJS
+const prismaModule = require('./generated/prisma') as typeof import('./generated/prisma')
+const { PrismaClient } = prismaModule
 const authenticateToken = require('./authenticateToken');
 
 const app = express();
@@ -82,6 +85,43 @@ app.delete('/card/:id', authenticateToken, async (req: any, res: any) => {
   await prisma.flashcard.delete({ where: { id: Number(id) } });
   res.json({ message: 'Card deleted' });
 });
+
+app.get("/deck/:id/export", authenticateToken, async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+  
+    const deck = await prisma.deck.findUnique({
+      where: { id: Number(id) },
+      include: { cards: true }
+    })
+  
+    if (!deck) {
+      return res.status(404).json({ error: "Deck not found" })
+    }
+  
+    if (deck.userId !== req.user.userId) {
+      return res.status(403).json({ error: "Unauthorized" })
+    }
+  
+    const dataToExport = deck.cards.map(card => ({
+      question: card.question,
+      answer: card.answer,
+      createdAt: card.createdAt.toISOString()
+    }))
+  
+    const csvData = stringify(dataToExport, {
+      header: true,
+      columns: ["question", "answer", "createdAt"]
+    })
+  
+    res.setHeader('Content-Disposition', `attachment; filename="${deck.name}.csv"`);
+    res.setHeader('Content-Type', 'text/csv');
+    res.send(csvData);
+  } catch (error) {
+    console.error('Error exporting deck:', error);
+    res.status(500).json({ error: 'Failed to export deck' });
+  }
+}); 
 
 app.post('/login', async (req: any, res: any) => {
   try {
