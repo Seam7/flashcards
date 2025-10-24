@@ -10,8 +10,18 @@ interface QuizCardProps {
 
 export const QuizCard = ({ card, answer }: QuizCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isAnswering, setIsAnswering] = useState(false);
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
+  };
+
+  // Handler for answer buttons with delay
+  const handleAnswer = (action: QuizAction) => {
+    setIsAnswering(true);
+    setTimeout(() => {
+      answer(action);
+      setIsAnswering(false);
+    }, 150);
   };
 
   return (
@@ -29,20 +39,18 @@ export const QuizCard = ({ card, answer }: QuizCardProps) => {
             <Button
               variant="contained"
               color="success"
-              onClick={() => {
-                answer({ type: "ANSWER_CORRECT" });
-              }}
+              onClick={() => handleAnswer({ type: "ANSWER_CORRECT" })}
               className="quiz-button"
+              disabled={isAnswering}
             >
               Correct
             </Button>
             <Button
               variant="contained"
               color="error"
-              onClick={() => {
-                answer({ type: "ANSWER_INCORRECT" });
-              }}
+              onClick={() => handleAnswer({ type: "ANSWER_INCORRECT" })}
               className="quiz-button"
+              disabled={isAnswering}
             >
               Incorrect
             </Button>
